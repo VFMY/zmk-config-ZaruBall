@@ -1,16 +1,40 @@
 #include "ZaruBall.dtsi"
 
 &kscan0 {
-    col-gpios = 
-        <&xiao_d 10 GPIO_ACTIVE_HIGH>,
-        <&xiao_d 9 GPIO_ACTIVE_HIGH>,
-        <&xiao_d 8 GPIO_ACTIVE_HIGH>,
-        <&xiao_d 7 GPIO_ACTIVE_HIGH>,
-        <&gpio0 9 GPIO_ACTIVE_HIGH>,
-        <&gpio0 10 GPIO_ACTIVE_HIGH>,
-        <&xiao_d 4 GPIO_ACTIVE_HIGH>;
+    gpios
+        = <&xiao_d 0 GPIO_ACTIVE_HIGH>//M1
+        , <&xiao_d 1 GPIO_ACTIVE_HIGH>//M2
+        , <&xiao_d 2 GPIO_ACTIVE_HIGH>//M3
+        , <&xiao_d 3 GPIO_ACTIVE_HIGH>//M4
+        , <&xiao_d 4 GPIO_ACTIVE_HIGH>//M5
+        , <&xiao_d 5 GPIO_ACTIVE_HIGH>//M6
+        , <&xiao_d 6 GPIO_ACTIVE_HIGH>//M7
+
+        , <&xiao_d 9 GPIO_ACTIVE_HIGH>//T1
+        , <&xiao_d 8 GPIO_ACTIVE_HIGH>//T2
+        , <&xiao_d 7 GPIO_ACTIVE_HIGH>//T3
+        , <&gpio1 10 GPIO_ACTIVE_HIGH>//T4
+        , <&gpio0 16 GPIO_ACTIVE_HIGH>//T5
+        ;
+    interrupt-gpios = <&xiao_d 10 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;//IGPIO
 };
 
 &left_encoder {
     status = "okay";
 };
+// === 左側にはトラックボールが無いので SPI0 ごと無効化する ===
+// 共有 ZaruBall.dtsi は &spi0 と &trackball を status="okay" にしているため、
+// 何もしないと左側でも SPIM がピンを占有してしまう。
+//   SPIM SCK   = P1.15 = D10 → kscan の interrupt-gpios と衝突
+//   SPIM DATA  = P1.13 = D8  → 親指キー T2 と衝突
+//   CS         = P1.14 = D9  → 親指キー T1 と衝突
+//   PMW3610 IRQ= P1.12 = D7  → 親指キー T3 と衝突
+// 特に P1.15 を奪われると、深いスリープからの復帰トリガが消える。
+// さらに spi0_sleep は low-power-enable なので、サスペンド時に該当ピンが
+// 切り離され、ペリフェラルが二度と起きなくなる。
+&spi0 { status = "disabled"; };
+&trackball { status = "disabled"; };
+
+// uart0(P1.11=D6 / P1.12=D7) も kscan の M7 / T3 と衝突するため無効化。
+// 右側オーバーレイが同じ理由で既に無効化している。
+&xiao_serial { status = "disabled"; };
