@@ -88,6 +88,26 @@
     };
 };
 
+// ホールドタップ共通設定
+// flavor            : balanced = 他キーを「押して離す」までホールド確定を待つ
+// tapping-term-ms   : この時間押し続けるとホールド確定
+// quick-tap-ms      : 直前に同じキーをタップしていたら必ずタップ（;; などの連打対策）
+// require-prior-idle-ms : 直前の打鍵からこの時間空いていなければ必ずタップ（速打ち対策の本命）
+
+&mt {
+    flavor = "balanced";
+    tapping-term-ms = <200>;
+    quick-tap-ms = <175>;
+    require-prior-idle-ms = <150>;
+};
+
+&lt {
+    flavor = "balanced";
+    tapping-term-ms = <200>;
+    quick-tap-ms = <175>;
+    require-prior-idle-ms = <150>;
+};
+
 &sl { release-after-ms = <250>; }; // time needed for double click (for mkp_exit_AML)
 / {
     macros {
