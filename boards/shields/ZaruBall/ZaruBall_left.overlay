@@ -35,6 +35,9 @@
 &spi0 { status = "disabled"; };
 &trackball { status = "disabled"; };
 
-// uart0(P1.11=D6 / P1.12=D7) も kscan の M7 / T3 と衝突するため無効化。
-// 右側オーバーレイが同じ理由で既に無効化している。
-&xiao_serial { status = "disabled"; };
+// 注意: &xiao_serial (uart0) はここでは無効化しないこと。
+// ボードの chosen が zephyr,console / shell-uart / uart-mcumgr /
+// bt-mon-uart / bt-c2h-uart をすべて &uart0 に向けているため、
+// 左側で無効化するとコンソールの行き先が消えて DTS 検証に失敗する。
+// 右側は snippet: studio-rpc-usb-uart がコンソールを USB CDC に
+// 付け替えるので無効化できている。
